@@ -1,0 +1,20 @@
+# Build folders
+bin/
+obj/
+
+# User-specific files
+*.rsuser
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+# IDE folders
+.idea/
+.vscode/
+.vs/
+*.DS_Store
+
+# Program outputs
+collections.csv
+test.csv
