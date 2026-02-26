@@ -15,7 +15,7 @@ Import and export your osu!lazer beatmaps.
     ```
 2. Build the project:
     ```bash
-    dotnet build src/OsuBeatmapManager
+    dotnet build src/obm
     ```
 
 ## Usage
@@ -24,20 +24,20 @@ Run the application natively or via Nix.
 ### Exporting your Collections
 ```bash
 # Uses default ~/.local/share/osu path
-dotnet run --project src/OsuBeatmapManager -- export 
+dotnet run --project src/obm -- export 
 
 # Or via Nix Shell:
-nix run nixpkgs#dotnet-sdk_8 -- run --project src/OsuBeatmapManager -- export
+nix run nixpkgs#dotnet-sdk_8 -- run --project src/obm -- export
 ```
 
 You can optionally specify a custom database location:
 ```bash
-dotnet run --project src/OsuBeatmapManager -- export /path/to/my/osu/database output_collections.csv
+dotnet run --project src/obm -- export /path/to/my/osu/database output_collections.csv
 ```
 The resulting `collections.csv` provides metadata like Artist, Title, Difficulty, Set ID, and a mirror download link.
 
 ### Importing `.osz` from a CSV
 ```bash
 # Parses the CSV and sends downloads directly to Lazer
-dotnet run --project src/OsuBeatmapManager -- import collections.csv
+dotnet run --project src/obm -- import collections.csv
 ```
