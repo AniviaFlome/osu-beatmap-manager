@@ -63,6 +63,7 @@ public static class Program
         var app = new CommandApp();
         app.Configure(config =>
         {
+            config.SetApplicationName("obm");
             config.AddCommand<ExportCommand>("export")
                 .WithDescription("Parse local osu! databases and export collections to a CSV file.");
                 
