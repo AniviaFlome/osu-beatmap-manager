@@ -50,7 +50,7 @@ public class BeatmapInfo : RealmObject
     public string Hash { get; set; } = string.Empty;
 }
 
-public class CollectionCsvRow
+public sealed class CollectionCsvRow
 {
     public string Collection { get; set; } = string.Empty;
     public string Artist { get; set; } = string.Empty;

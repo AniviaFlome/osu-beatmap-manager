@@ -14,7 +14,7 @@ public static class Exporter
 
         if (!File.Exists(realmPath))
         {
-            AnsiConsole.MarkupLine($"[bold red]Error:[/] Could not find client.realm at {realmPath}");
+            AnsiConsole.MarkupLine($"[bold red]Error:[/] Could not find client.realm at {Markup.Escape(realmPath)}");
             return;
         }
 
@@ -93,8 +93,6 @@ public static class Exporter
                     }
 
                     var rows = new List<CollectionCsvRow>();
-                    var exportedCount = 0;
-                    var beatmapDataFound = 0;
                     var exportedMd5s = new HashSet<string>();
 
                     foreach (var bm in beatmaps)
@@ -103,16 +101,15 @@ public static class Exporter
                         if (string.IsNullOrEmpty(md5)) continue;
 
                         var setInfo = bm.BeatmapSet;
-                        // Metadata now only comes from bm.Metadata directly
                         var metadata = bm.Metadata;
 
                         var onlineSetId = setInfo?.OnlineID ?? 0;
                         if (onlineSetId <= 0) continue;
 
-                        beatmapDataFound++;
+                        foundMapsCount++;
 
-                        var cols = md5ToCols.TryGetValue(md5, out var colList) && colList.Count > 0 
-                            ? colList 
+                        var cols = md5ToCols.TryGetValue(md5, out var colList) && colList.Count > 0
+                            ? colList
                             : new List<string> { "None" };
 
                         if (colList != null)
@@ -138,7 +135,7 @@ public static class Exporter
                                 MD5 = md5,
                                 DownloadLink = dlLink
                             });
-                            exportedCount++;
+                            successfulExportsCount++;
                         }
                     }
 
@@ -146,11 +143,8 @@ public static class Exporter
                     using var csv = new CsvWriter(writer, new CsvConfiguration(CultureInfo.InvariantCulture));
                     csv.WriteRecords(rows);
 
-                    // Move formatting to clear properly after spinner stops
                     missingBeatmapsCount = md5ToCols.Count - exportedMd5s.Count;
                     parsedCollectionsCount = collections.Count;
-                    foundMapsCount = beatmapDataFound;
-                    successfulExportsCount = exportedCount;
                 }
                 catch (Exception e)
                 {
@@ -160,7 +154,7 @@ public static class Exporter
 
         if (!string.IsNullOrEmpty(errorMessage))
         {
-            AnsiConsole.MarkupLine($"[bold red]Error:[/] {errorMessage}");
+            AnsiConsole.MarkupLine($"[bold red]Error:[/] {Markup.Escape(errorMessage)}");
             return;
         }
 
@@ -171,6 +165,6 @@ public static class Exporter
             AnsiConsole.MarkupLine($"[bold yellow]Warning:[/] {missingBeatmapsCount} beatmaps were in collections but not found in the realm dataset (they might lack Online IDs). They were skipped.");
         }
 
-        AnsiConsole.MarkupLine($"[bold green]Successfully exported {successfulExportsCount} Beatmap mappings to {outputCsv}[/]");
+        AnsiConsole.MarkupLine($"[bold green]Successfully exported {successfulExportsCount} Beatmap mappings to {Markup.Escape(outputCsv)}[/]");
     }
 }

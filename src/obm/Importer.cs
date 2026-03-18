@@ -11,7 +11,7 @@ public static class Importer
     {
         if (!File.Exists(inputCsv))
         {
-            AnsiConsole.MarkupLine($"[bold red]Error:[/] Could not find CSV file at {inputCsv}");
+            AnsiConsole.MarkupLine($"[bold red]Error:[/] Could not find CSV file at {Markup.Escape(inputCsv)}");
             return;
         }
 
@@ -24,7 +24,7 @@ public static class Importer
         }
         catch (Exception e)
         {
-            AnsiConsole.MarkupLine($"[bold red]Error reading CSV file:[/] {e.Message}");
+            AnsiConsole.MarkupLine($"[bold red]Error reading CSV file:[/] {Markup.Escape(e.Message)}");
             return;
         }
 
@@ -60,19 +60,15 @@ public static class Importer
                         var setId = row.BeatmapSetID;
                         var url = row.DownloadLink;
 
-                        var invalidChars = Path.GetInvalidFileNameChars();
-                        var artistRaw = string.IsNullOrEmpty(row.Artist) ? "Unknown" : row.Artist;
-                        var titleRaw = string.IsNullOrEmpty(row.Title) ? "Unknown" : row.Title;
-
-                        var artist = string.Concat(artistRaw.Select(c => invalidChars.Contains(c) ? '_' : c));
-                        var title = string.Concat(titleRaw.Select(c => invalidChars.Contains(c) ? '_' : c));
+                        var artist = SanitizeFileName(row.Artist);
+                        var title = SanitizeFileName(row.Title);
 
                         var filename = $"{setId} {artist} - {title}.osz";
                         var destPath = Path.Combine(outputDir, filename);
 
                         if (File.Exists(destPath))
                         {
-                            AnsiConsole.MarkupLine($"[bold yellow]Skipping:[/] {filename} already exists.");
+                            AnsiConsole.MarkupLine($"[bold yellow]Skipping:[/] {Markup.Escape(filename)} already exists.");
                             successCount++;
                             continue;
                         }
@@ -98,14 +94,14 @@ public static class Importer
 
                             do
                             {
-                                var bytesRead = await contentStream.ReadAsync(buffer, 0, buffer.Length);
+                                var bytesRead = await contentStream.ReadAsync(buffer.AsMemory());
                                 if (bytesRead == 0)
                                 {
                                     isMoreToRead = false;
                                     continue;
                                 }
 
-                                await fileStream.WriteAsync(buffer, 0, bytesRead);
+                                await fileStream.WriteAsync(buffer.AsMemory(0, bytesRead));
                                 task.Increment(bytesRead);
                             }
                             while (isMoreToRead);
@@ -114,7 +110,7 @@ public static class Importer
                         }
                         catch (Exception e)
                         {
-                            AnsiConsole.MarkupLine($"[bold red]Failed to download {url}:[/] {e.Message}");
+                            AnsiConsole.MarkupLine($"[bold red]Failed to download {Markup.Escape(url)}:[/] {Markup.Escape(e.Message)}");
                             if (File.Exists(destPath)) File.Delete(destPath);
                         }
                         finally
@@ -140,19 +136,17 @@ public static class Importer
                 {
                     try
                     {
-                        var proc = Process.Start(new ProcessStartInfo
+                        Process.Start(new ProcessStartInfo
                         {
                             FileName = osuBin,
                             Arguments = $"\"{osz}\"",
                             UseShellExecute = false,
-                            RedirectStandardOutput = true,
-                            RedirectStandardError = true,
                         });
                         importCount++;
                     }
                     catch (Exception e)
                     {
-                        AnsiConsole.MarkupLine($"[bold red]Failed to run osu! auto-import for {Path.GetFileName(osz)}:[/] {e.Message}");
+                        AnsiConsole.MarkupLine($"[bold red]Failed to run osu! auto-import for {Markup.Escape(Path.GetFileName(osz))}:[/] {Markup.Escape(e.Message)}");
                     }
                 }
 
@@ -200,9 +194,17 @@ public static class Importer
         }
     }
 
+    private static readonly char[] InvalidFileNameChars = Path.GetInvalidFileNameChars();
+
+    private static string SanitizeFileName(string input)
+    {
+        var value = string.IsNullOrEmpty(input) ? "Unknown" : input;
+        return string.Concat(value.Select(c => InvalidFileNameChars.Contains(c) ? '_' : c));
+    }
+
     private static string? GetOsuExecutable()
     {
-        var paths = Environment.GetEnvironmentVariable("PATH")?.Split(Path.PathSeparator) ?? Array.Empty<string>();
+        var paths = Environment.GetEnvironmentVariable("PATH")?.Split(Path.PathSeparator) ?? [];
         var candidates = new[] { "osu!", "osu-lazer", "osu-lazer-bin" };
 
         foreach (var path in paths)

@@ -25,7 +25,7 @@ public class ExportCommand : Command<ExportCommand.Settings>
         settings.OsuDir = settings.OsuDir.Replace("~", Environment.GetFolderPath(Environment.SpecialFolder.UserProfile));
         
         AnsiConsole.Write(
-            new Panel($"[bold cyan]Exporting osu! collections[/]\nSource: {settings.OsuDir}\nDestination: {settings.OutputCsv}")
+            new Panel($"[bold cyan]Exporting osu! collections[/]\nSource: {Markup.Escape(settings.OsuDir)}\nDestination: {Markup.Escape(settings.OutputCsv)}")
                 .Expand()
         );
 
@@ -47,7 +47,7 @@ public class ImportCommand : AsyncCommand<ImportCommand.Settings>
     public override async Task<int> ExecuteAsync([NotNull] CommandContext context, [NotNull] Settings settings)
     {
         AnsiConsole.Write(
-            new Panel($"[bold cyan]Importing osu! beatmaps[/]\nSource CSV: {settings.InputCsv}\n[italic]Beatmaps will be downloaded temporarily and sent directly to osu!lazer.[/]")
+            new Panel($"[bold cyan]Importing osu! beatmaps[/]\nSource CSV: {Markup.Escape(settings.InputCsv)}\n[italic]Beatmaps will be downloaded temporarily and sent directly to osu!lazer.[/]")
                 .Expand()
         );
 
