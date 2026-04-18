@@ -121,7 +121,7 @@ public static class Exporter
                         var artist = metadata?.Artist ?? "Unknown";
                         var title = metadata?.Title ?? "Unknown";
                         var diff = string.IsNullOrEmpty(bm.DifficultyName) ? "Unknown" : bm.DifficultyName;
-                        var starRating = bm.StarRating;
+                        var starRating = Math.Round(bm.StarRating, 2);
 
                         foreach (var c in cols)
                         {
