@@ -62,6 +62,8 @@ public static class Exporter
                             typeof(BeatmapCollection),
                             typeof(RealmUser),
                             typeof(BeatmapMetadata),
+                            typeof(BeatmapDifficulty),
+                            typeof(RulesetInfo),
                             typeof(BeatmapSetInfo),
                             typeof(BeatmapInfo)
                         }
@@ -118,10 +120,21 @@ public static class Exporter
                         }
 
                         var dlLink = $"https://catboy.best/d/{onlineSetId}";
+                        var previewLink = $"https://b.ppy.sh/preview/{onlineSetId}.mp3";
                         var artist = metadata?.Artist ?? "Unknown";
                         var title = metadata?.Title ?? "Unknown";
                         var diff = string.IsNullOrEmpty(bm.DifficultyName) ? "Unknown" : bm.DifficultyName;
                         var starRating = Math.Round(bm.StarRating, 2);
+                        var bpm = Math.Round(bm.BPM, 2);
+                        var difficulty = bm.Difficulty;
+                        var cs = Math.Round(difficulty?.CircleSize ?? 0f, 2);
+                        var ar = Math.Round(difficulty?.ApproachRate ?? 0f, 2);
+                        var od = Math.Round(difficulty?.OverallDifficulty ?? 0f, 2);
+                        var hp = Math.Round(difficulty?.DrainRate ?? 0f, 2);
+                        var length = TimeSpan.FromMilliseconds(bm.Length).ToString(@"mm\:ss");
+                        var rulesetId = bm.Ruleset?.OnlineID ?? 0;
+                        var ruleset = bm.Ruleset?.ShortName ?? rulesetId switch { 0 => "osu!", 1 => "taiko", 2 => "catch", 3 => "mania", _ => $"unknown({rulesetId})" };
+                        var status = bm.Status switch { -2 => "graveyard", -1 => "WIP", 0 => "pending", 1 => "ranked", 2 => "approved", 3 => "qualified", 4 => "loved", _ => $"unknown({bm.Status})" };
 
                         foreach (var c in cols)
                         {
@@ -132,10 +145,19 @@ public static class Exporter
                                 Title = title,
                                 Difficulty = diff,
                                 StarRating = starRating,
+                                BPM = bpm,
+                                CS = cs,
+                                AR = ar,
+                                OD = od,
+                                HP = hp,
+                                Length = length,
+                                Ruleset = ruleset,
+                                Status = status,
                                 BeatmapID = bm.OnlineID,
                                 BeatmapSetID = onlineSetId,
                                 MD5 = md5,
-                                DownloadLink = dlLink
+                                DownloadLink = dlLink,
+                                PreviewLink = previewLink
                             });
                             successfulExportsCount++;
                         }
