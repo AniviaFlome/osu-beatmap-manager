@@ -121,6 +121,7 @@ public static class Exporter
                         var artist = metadata?.Artist ?? "Unknown";
                         var title = metadata?.Title ?? "Unknown";
                         var diff = string.IsNullOrEmpty(bm.DifficultyName) ? "Unknown" : bm.DifficultyName;
+                        var starRating = bm.StarRating;
 
                         foreach (var c in cols)
                         {
@@ -130,6 +131,7 @@ public static class Exporter
                                 Artist = artist,
                                 Title = title,
                                 Difficulty = diff,
+                                StarRating = starRating,
                                 BeatmapID = bm.OnlineID,
                                 BeatmapSetID = onlineSetId,
                                 MD5 = md5,

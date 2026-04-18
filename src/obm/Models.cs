@@ -45,6 +45,7 @@ public class BeatmapInfo : RealmObject
     [MapTo("Metadata")]
     public BeatmapMetadata? Metadata { get; set; }
     public string DifficultyName { get; set; } = string.Empty;
+    public double StarRating { get; set; }
     public int OnlineID { get; set; }
     public string MD5Hash { get; set; } = string.Empty;
     public string Hash { get; set; } = string.Empty;
@@ -56,6 +57,7 @@ public sealed class CollectionCsvRow
     public string Artist { get; set; } = string.Empty;
     public string Title { get; set; } = string.Empty;
     public string Difficulty { get; set; } = string.Empty;
+    public double StarRating { get; set; }
     public int BeatmapID { get; set; }
     public int BeatmapSetID { get; set; }
     public string MD5 { get; set; } = string.Empty;
